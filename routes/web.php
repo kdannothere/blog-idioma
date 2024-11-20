@@ -1,12 +1,13 @@
 <?php
 
+use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Posts');
-})->name('home');
+Route::get('/', [PostController::class, 'index'])->name('home');
+
+Route::resource('posts', PostController::class)->except('index');
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');

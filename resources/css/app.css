@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+input:focus-visible, textarea:focus-visible {
+    border: black solid 1px !important;
+    box-shadow: 0px 0px 0px 0.1px inset !important;
+}
