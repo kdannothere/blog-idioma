@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        Post::factory(10)->create([
+        Post::factory(200)->create([
             'user_id' => 1,
             'title' => fake()->sentence(),
             'body' => fake()->paragraph(20),

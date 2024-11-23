@@ -1,15 +1,16 @@
 import { Head } from "@inertiajs/react";
 import Pagination from "@/Components/Pagination";
-import Post from "./post/components/Post";
+import Post from "./components/Post";
 
-export default function Home({ posts }) {
+export default function UserPosts({ posts, author }) {
   return (
     <>
-      <Head title="Home" />
+      <Head title="Dashboard" />
 
       <h1 className="text-xl text-center mt-4 font-semibold leading-tight text-gray-800">
-        Latest posts
+        {author}'s posts
       </h1>
+
       <div className="mx-4 block md:grid md:grid-cols-2 2xl:grid-cols-3">
         {posts.data &&
           posts.data.map((post) => (
