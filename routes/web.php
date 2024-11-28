@@ -23,9 +23,11 @@ Possible solutions: make more complicated msg by attaching msgId, save it in cac
 
 Route::get('/', [PostController::class, 'index'])->name('home');
 
+Route::resource('posts', PostController::class)->except(['index', 'indexUser']);
+
 Route::get('/users/{user}/posts', [PostController::class, 'indexUser'])->name('posts.user');
 
-Route::resource('posts', PostController::class)->except(['index', 'indexUser']);
+// Route::post('posts/{post}', [PostController::class, 'update'])->name('posts.update');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 

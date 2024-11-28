@@ -4,6 +4,7 @@ export default function CreatePost() {
   const { data, setData, post, errors, processing } = useForm({
     title: "",
     body: "",
+    image: null,
   });
 
   const errorsActive = errors;
@@ -24,6 +25,7 @@ export default function CreatePost() {
       <div>
         <form
           onSubmit={submit}
+          encType="multipart/form-data"
           className="w-96 sm:w-[512px] py-12 px-8 mx-auto"
         >
           <label className="mb-1 block" htmlFor="title">
@@ -33,7 +35,7 @@ export default function CreatePost() {
             name="title"
             value={data.title}
             className={`w-full mb-4 ${
-              (errors.title && errorsActive.title) ? "border-red-500" : ''
+              errors.title && errorsActive.title ? "border-red-500" : ""
             }`}
             type="text"
             onChange={(e) => {
@@ -48,8 +50,8 @@ export default function CreatePost() {
           <textarea
             name="body"
             value={data.body}
-            className={`w-full min-h-64 ${
-              (errors.body && errorsActive.body) ? "border-red-500" : ''
+            className={`mb-4 w-full min-h-64 ${
+              errors.body && errorsActive.body ? "border-red-500" : ""
             }`}
             type="text"
             onChange={(e) => {
@@ -59,6 +61,26 @@ export default function CreatePost() {
             rows={10}
           />
           {errors.body && <p className="text-red-500 pb-4">{errors.body}</p>}
+          
+          <label className="mt-2 mb-1 block" htmlFor="image">
+            Image
+          </label>
+          <input
+            name="image"
+            className={`w-full mb-4 ${
+              errors.image && errorsActive.image
+                ? "border-red-500"
+                : ""
+            }`}
+            type="file"
+            onChange={(e) => {
+              setData("image", e.target.files[0]);
+              errors.image = "";
+            }}
+          />
+          {errors.image && (
+            <p className="text-red-500 pb-4">{errors.image}</p>
+          )}
 
           <button
             className={`mx-auto px-16 py-2 mt-8 bg-slate-300 hover:bg-slate-400 rounded-full flex ${

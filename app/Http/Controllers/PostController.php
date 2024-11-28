@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller implements HasMiddleware
 {
@@ -51,13 +52,27 @@ class PostController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-        $fields = $request->validate([
+        // Validate
+        $request->validate([
             'title' => ['required', 'min:1', 'max:255'],
-            'body' => ['required', 'min:1', 'max:40000']
+            'body' => ['required', 'min:1', 'max:40000'],
+            'image' => ['nullable', 'file', 'max:1000', 'mimes:webp,jpg,png'],
         ]);
 
-        Auth::user()->posts()->create($fields);
+        // Store post image if exists
+        $path = null;
+        if ($request->hasFile('image')) {
+            $path = Storage::disk('public')->put('posts_images', $request->image);
+        }
 
+        // Create a post
+        Auth::user()->posts()->create([
+            'title' => $request->title,
+            'body' => $request->body,
+            'image' => $path,
+        ]);
+
+        // Redirect back to dashboard with a message
         return redirect(route('dashboard'))->with('message', 'Created post successfully');
     }
 
@@ -84,7 +99,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function edit(Post $post)
     {
-        return inertia('post/EditPost', ['post' => $post]);
+        return inertia('post/EditPost', ['currentPost' => $post]);
     }
 
     /**
@@ -92,12 +107,27 @@ class PostController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Post $post)
     {
-        $fields = $request->validate([
+        $request->validate([
             'title' => ['required', 'min:1', 'max:255'],
-            'body' => ['required', 'min:1', 'max:40000']
+            'body' => ['required', 'min:1', 'max:40000'],
+            'image' => ['nullable', 'file', 'max:2048', 'mimes:webp,jpg,png'],
         ]);
 
-        $post->update($fields);
+        // Store post image if exists
+        $path = $post->image ?? null;
+        if ($request->hasFile('image')) {
+            // Delete previous post image if exists
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image);
+            }
+            $path = Storage::disk('public')->put('posts_images', $request->image);
+        }
+
+        $post->update([
+            'title' => $request->title,
+            'body' => $request->body,
+            'image' => $path,
+        ]);
 
         return redirect(route('dashboard'))->with('message', 'Updated post successfully');
     }
@@ -107,6 +137,10 @@ class PostController extends Controller implements HasMiddleware
      */
     public function destroy(Post $post)
     {
+        // Delete post image if exists
+        if ($post->image) {
+            Storage::disk('public')->delete($post->image);
+        }
         $post->delete();
 
         return redirect(route('dashboard'))->with('message', 'Deleted post successfully');

@@ -17,9 +17,23 @@ const Post = ({
     e.preventDefault();
     destroy(route("posts.destroy", post));
   }
+
   return (
     <>
       <article className="my-8 p-8 min-w-80 flex flex-col md:mx-8 bg-slate-200 rounded-3xl overflow-hidden">
+        {post.image ? (
+          <img
+            className="w-20 h-20 mb-4"
+            src={"/storage/" + post.image}
+            alt=""
+          />
+        ) : (
+          <img
+            className="w-20 h-20 mb-4"
+            src={"/storage/" + "posts_images/default.jpg"}
+            alt=""
+          />
+        )}
         <div className="panel flex justify-between">
           <div className="info text-sm text-gray-500">
             <p className="flex flex-wrap">
