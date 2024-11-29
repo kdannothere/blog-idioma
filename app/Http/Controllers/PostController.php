@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller implements HasMiddleware
@@ -47,7 +48,7 @@ class PostController extends Controller implements HasMiddleware
         return inertia('post/CreatePost');
     }
 
-    /**as
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -81,7 +82,6 @@ class PostController extends Controller implements HasMiddleware
      */
     public function show(Post $post)
     {
-
         $user = $post->user;
 
         $action = ['edit' => false, 'delete' => false];
@@ -99,6 +99,9 @@ class PostController extends Controller implements HasMiddleware
      */
     public function edit(Post $post)
     {
+        // Authorizing the action
+        Gate::authorize('modify', $post);
+
         return inertia('post/EditPost', ['currentPost' => $post]);
     }
 
@@ -107,6 +110,9 @@ class PostController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Post $post)
     {
+        // Authorizing the action
+        Gate::authorize('modify', $post);
+
         $request->validate([
             'title' => ['required', 'min:1', 'max:255'],
             'body' => ['required', 'min:1', 'max:40000'],
@@ -137,6 +143,9 @@ class PostController extends Controller implements HasMiddleware
      */
     public function destroy(Post $post)
     {
+        // Authorizing the action
+        Gate::authorize('modify', $post);
+
         // Delete post image if exists
         if ($post->image) {
             Storage::disk('public')->delete($post->image);

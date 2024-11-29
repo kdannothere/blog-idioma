@@ -4,7 +4,7 @@ const Pagination = ({ items }) => {
   return (
     <>
       {items.links.length > 3 && (
-        <nav className="my-4 flex flex-wrap col-span-full md:mx-8">
+        <nav className="my-4 mx-2 flex flex-wrap col-span-full md:mx-8">
           {items.links.map((link) =>
             link.url && !link.active ? (
               <Link

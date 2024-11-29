@@ -29,7 +29,7 @@ Route::get('/users/{user}/posts', [PostController::class, 'indexUser'])->name('p
 
 // Route::post('posts/{post}', [PostController::class, 'update'])->name('posts.update');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
