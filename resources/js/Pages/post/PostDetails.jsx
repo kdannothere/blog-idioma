@@ -13,8 +13,9 @@ export default function PostDetails({ post, user, action }) {
   return (
     <>
       <Head title={post.title} />
-
-      <Post post={post} user={user} action={action} />
+      <div className="my-8">
+        <Post post={post} user={user} action={action} />
+      </div>
     </>
   );
 }

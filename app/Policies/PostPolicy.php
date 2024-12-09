@@ -7,7 +7,7 @@ use App\Models\User;
 
 class PostPolicy
 {
-    public function isOwner(User $user, Post $post): bool
+    public function modify(User $user, Post $post): bool
     {
         return $user->id === $post->user_id;
     }

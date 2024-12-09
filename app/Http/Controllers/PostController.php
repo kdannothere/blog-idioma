@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Post\NewPostMail;
 use App\Models\Post;
+use App\Models\Subscriber;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller implements HasMiddleware
@@ -35,9 +38,22 @@ class PostController extends Controller implements HasMiddleware
      */
     public function indexUser(User $user)
     {
+        $currentUser = Auth::user();
         $posts = $user->posts()->latest()->with('user')->paginate(6);
+        $isSubscribed = false;
+        $isAuthor = false;
 
-        return inertia('post/UserPosts', ['posts' => $posts, 'author' => $user->name]);
+        if ($currentUser && $currentUser->id === $user->id) {
+            $isAuthor = true;
+        }
+
+        if ($currentUser && !$isAuthor) {
+            $isSubscribed = Subscriber::where('email', $currentUser->email)
+                ->where('user_id', $user->id)
+                ->first() && true;
+        }
+
+        return inertia('post/UserPosts', ['posts' => $posts, 'user' => $user, 'isSubscribed' => $isSubscribed, 'isAuthor' => $isAuthor]);
     }
 
     /**
@@ -66,12 +82,22 @@ class PostController extends Controller implements HasMiddleware
             $path = Storage::disk('public')->put('posts_images', $request->image);
         }
 
+        $user = Auth::user();
+
         // Create a post
-        Auth::user()->posts()->create([
+        $post = $user->posts()->create([
             'title' => $request->title,
             'body' => $request->body,
             'image' => $path,
         ]);
+
+        $postUrl = url()->route('posts.show', $post);
+        
+        $subscribers = Subscriber::where('user_id', $user->id);
+        
+        $subscribers->each(function ($subscriber) use ($post, $postUrl) {
+            Mail::to($subscriber->email)->send(new NewPostMail($post, $postUrl));
+        });
 
         // Redirect back to dashboard with a message
         return redirect(route('dashboard'))->with('message', 'Created post successfully');
@@ -127,6 +153,11 @@ class PostController extends Controller implements HasMiddleware
                 Storage::disk('public')->delete($post->image);
             }
             $path = Storage::disk('public')->put('posts_images', $request->image);
+        } else {
+            if ($post->image) {
+                Storage::disk('public')->delete($post->image);
+                $path = null;
+            }
         }
 
         $post->update([

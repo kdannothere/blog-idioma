@@ -1,4 +1,5 @@
 import { Head, useForm } from "@inertiajs/react";
+import { useState } from "react";
 
 export default function CreatePost() {
   const { data, setData, post, errors, processing } = useForm({
@@ -14,11 +15,38 @@ export default function CreatePost() {
     post("/posts");
   }
 
+  const [image, setImage] = useState(null);
+  const reader = new FileReader();
+
+  // change and preview post image
+  function handleImageChange(e) {
+    const file = e.target.files[0];
+
+    reader.onload = (e) => {
+      if (file.size > 2048000) {
+        // 2 MB limit
+        alert("File size exceeds the limit of 2MB");
+        return;
+      }
+
+      setImage(e.target.result);
+      setData("image", file);
+      errorsActive.image = "";
+    };
+
+    file && reader.readAsDataURL(file);
+  }
+
+  function removeImage() {
+    setData("image", null);
+    setImage(null);
+  }
+
   return (
     <>
       <Head title="Create new post" />
 
-      <h1 className="text-xl text-center mt-4 font-semibold leading-tight text-gray-800">
+      <h1 className="text-xl text-center my-4 font-semibold leading-tight text-gray-800">
         Create new post
       </h1>
 
@@ -61,25 +89,35 @@ export default function CreatePost() {
             rows={10}
           />
           {errors.body && <p className="text-red-500 pb-4">{errors.body}</p>}
-          
+
           <label className="mt-2 mb-1 block" htmlFor="image">
             Image
           </label>
           <input
             name="image"
-            className={`w-full mb-4 ${
-              errors.image && errorsActive.image
-                ? "border-red-500"
-                : ""
-            }`}
+            id="image"
             type="file"
-            onChange={(e) => {
-              setData("image", e.target.files[0]);
-              errors.image = "";
-            }}
+            className={`w-full mb-4 ${
+              errors.image && errorsActive.image ? "border-red-500" : ""
+            }`}
+            onChange={handleImageChange}
           />
-          {errors.image && (
-            <p className="text-red-500 pb-4">{errors.image}</p>
+          {errors.image && <p className="text-red-500 pb-4">{errors.image}</p>}
+
+          {image && (
+            <div>
+              <img
+                className="w-20 h-20 mb-4"
+                src={image ? image : ""}
+                alt="post's image"
+              />
+              <button
+                onClick={removeImage}
+                className="px-2 py-1 mt-4 text-sm text-white bg-red-500 hover:bg-red-400 rounded-sm flex"
+              >
+                Remove image
+              </button>
+            </div>
           )}
 
           <button

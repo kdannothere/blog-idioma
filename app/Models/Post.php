@@ -24,6 +24,8 @@ class Post extends Model
 
     public function isOwner(): bool
     {
-        return Auth::user() ? $this->user->id === Auth::user()->id : false;
+        $currentUser = Auth::user();
+
+        return $currentUser ? $this->user->id === $currentUser->id : false;
     }
 }

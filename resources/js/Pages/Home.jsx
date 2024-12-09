@@ -7,7 +7,7 @@ export default function Home({ posts }) {
     <>
       <Head title="Home" />
 
-      <h1 className="text-xl text-center mt-4 font-semibold leading-tight text-gray-800">
+      <h1 className="text-xl text-center my-4 font-semibold leading-tight text-gray-800">
         Latest posts
       </h1>
       <div className="mx-4 block md:grid md:grid-cols-2 2xl:grid-cols-3">

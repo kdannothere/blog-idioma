@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SubscriberController;
 use Illuminate\Support\Facades\Route;
 
 /* 
@@ -23,13 +24,17 @@ Possible solutions: make more complicated msg by attaching msgId, save it in cac
 
 Route::get('/', [PostController::class, 'index'])->name('home');
 
-Route::resource('posts', PostController::class)->except(['index', 'indexUser']);
+Route::resource('posts', PostController::class)->except(['index', 'indexUser', 'show']);
 
 Route::get('/users/{user}/posts', [PostController::class, 'indexUser'])->name('posts.user');
 
+Route::get('posts/{post}', [PostController::class, 'show'])->name('posts.show');
 // Route::post('posts/{post}', [PostController::class, 'update'])->name('posts.update');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::post('/users/{user}/subscribe', [SubscriberController::class, 'subscribe'])->name('user.subscribe');
+Route::post('/users/{user}/unsubscribe', [SubscriberController::class, 'unsubscribe'])->name('user.unsubscribe');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -39,6 +44,6 @@ Route::middleware('auth')->group(function () {
 
 Route::fallback(function () {
     return inertia('NotFound');
-});
+})->name('404');
 
 require __DIR__ . '/auth.php';

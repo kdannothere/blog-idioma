@@ -10,7 +10,7 @@ export default function Dashboard({ posts }) {
 
       <Message />
 
-      <h1 className="text-xl text-center mt-4 font-semibold leading-tight text-gray-800">
+      <h1 className="text-xl text-center my-4 font-semibold leading-tight text-gray-800">
         Your posts
       </h1>
 

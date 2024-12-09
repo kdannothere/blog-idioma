@@ -52,6 +52,12 @@ export default function EditPost({ currentPost }) {
     file && reader.readAsDataURL(file);
   }
 
+  function removeImage() {
+    setData("image", null);
+    currentPost.image = null;
+    setImage(null);
+  }
+
   return (
     <>
       <Head title="Edit post" />
@@ -113,19 +119,20 @@ export default function EditPost({ currentPost }) {
               errors.image && errorsActive.image ? "border-red-500" : ""
             }`}
             onChange={handleImageChange}
-            // onChange={(e) => {
-            //   setData("image", e.target.files[0]);
-            //   errorsActive.image = "";
-            // }}
           />
           {errors.image && <p className="text-red-500 pb-4">{errors.image}</p>}
 
           {(currentPost.image || image) && (
-            <img
-              className="w-20 h-20 mb-4"
-              src={image ? image : "/storage/" + currentPost.image}
-              alt="post's image"
-            />
+            <div>
+              <img
+                className="w-20 h-20 mb-4"
+                src={image ? image : "/storage/" + currentPost.image}
+                alt="post's image"
+              />
+              <button onClick={removeImage} className="px-2 py-1 mt-4 text-sm text-white bg-red-500 hover:bg-red-400 rounded-sm flex">
+                Remove image
+              </button>
+            </div>
           )}
 
           <button
