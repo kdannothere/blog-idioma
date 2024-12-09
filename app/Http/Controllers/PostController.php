@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\Post\NewPostMail;
+use App\Events\NewPostMailEvent;
 use App\Models\Post;
 use App\Models\Subscriber;
 use App\Models\User;
@@ -11,7 +11,6 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller implements HasMiddleware
@@ -92,12 +91,8 @@ class PostController extends Controller implements HasMiddleware
         ]);
 
         $postUrl = url()->route('posts.show', $post);
-        
-        $subscribers = Subscriber::where('user_id', $user->id);
-        
-        $subscribers->each(function ($subscriber) use ($post, $postUrl) {
-            Mail::to($subscriber->email)->send(new NewPostMail($post, $postUrl));
-        });
+
+        event(new NewPostMailEvent($post, $postUrl, $user->id));
 
         // Redirect back to dashboard with a message
         return redirect(route('dashboard'))->with('message', 'Created post successfully');
